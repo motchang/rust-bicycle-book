@@ -4,7 +4,7 @@
 //   mut は値が変更可能であることを示す
 //   u32 型は32ビット符号なし整数
 //   [u32] 型はu32のスライス（現時点ではスライスは1次元の配列と考えてよい）
-pub fn sort(x: &mut [u32], up: bool) {
+pub fn sort<T>(x: &mut [T], up: bool) {
     // 未実装の意味。コンパイルは通るが、実行すると panic する
     // unimplemented!();
 
@@ -16,7 +16,7 @@ pub fn sort(x: &mut [u32], up: bool) {
     }
 }
 
-fn sub_sort(x: &mut [u32], up: bool) {
+fn sub_sort<T>(x: &mut [T], up: bool) {
     if x.len() > 1 {
         compare_and_swap(x, up);
         let mid_point = x.len() / 2;
@@ -25,7 +25,7 @@ fn sub_sort(x: &mut [u32], up: bool) {
     }
 }
 
-fn compare_and_swap(x: &mut [u32], up: bool) {
+fn compare_and_swap<T>(x: &mut [T], up: bool) {
     let mid_point = x.len() / 2;
     for i in 0..mid_point {
         if (x[mid_point + i] < x[i]) == up {
