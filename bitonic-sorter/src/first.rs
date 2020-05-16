@@ -28,9 +28,38 @@ fn sub_sort(x: &mut [u32], up: bool) {
 fn compare_and_swap(x: &mut [u32], up: bool) {
     let mid_point = x.len() / 2;
     for i in 0..mid_point {
-        if (x[mid_point + 1] < x[i]) == up {
+        if (x[mid_point + i] < x[i]) == up {
             // 要素を交換する
-            x.swap(i, mid_point + 1);
+            x.swap(i, mid_point + i);
         }
+    }
+}
+
+
+// このモジュールは cargo test を実行したときのみコンパイルされる
+#[cfg(test)]
+mod tests {
+    // 親モジュール（first）のsort関数を使用する
+    use super::sort;
+
+    // #[test] のついた関数はcargo testしたときに実行される
+    #[test]
+    fn sort_32_ascending() {
+        // テストデータとして u32型のベクタを作成しxに束縛する
+        // sort関数によって内容が更新されるので、可変を表す mut キーワードが必要
+        let mut x = vec![10, 30, 11, 20, 4, 330, 21, 110];
+
+        // xのスライスを作成し、sort関数を呼び出す
+        // &mut xは &mut x[..]と書いてもいい
+        sort(&mut x, true);
+
+        assert_eq!(x, vec![4, 10, 11, 20, 21, 30, 110, 330]);
+    }
+
+    #[test]
+    fn sort_32_descending() {
+        let mut x = vec![10, 30, 11, 20, 4, 330, 21, 110];
+        sort(&mut x, false);
+        assert_eq!(x, vec![330, 110, 30, 21, 20, 11, 10, 4]);
     }
 }
