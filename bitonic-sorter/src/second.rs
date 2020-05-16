@@ -5,14 +5,23 @@
 //   u32 型は32ビット符号なし整数
 //   [u32] 型はu32のスライス（現時点ではスライスは1次元の配列と考えてよい）
 // 型パラメータＴにトレイト境界Ord（全順序）を追加する
-pub fn sort<T: Ord>(x: &mut [T], up: bool) {
+use super::SortOrder;
+
+pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) {
+    match *order{
+        SortOrder::Ascending => do_sort(x, true),
+        SortOrder::Descending => do_sort(x, false),
+    }
+}
+
+fn do_sort<T: Ord>(x: &mut [T], up: bool) {
     // 未実装の意味。コンパイルは通るが、実行すると panic する
     // unimplemented!();
 
     if x.len() > 1 {
         let mid_point = x.len() / 2;
-        sort(&mut x[..mid_point], true);
-        sort(&mut x[mid_point..], false);
+        do_sort(&mut x[..mid_point], true);
+        do_sort(&mut x[mid_point..], false);
         sub_sort(x, up);
     }
 }
