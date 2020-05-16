@@ -4,7 +4,8 @@
 //   mut は値が変更可能であることを示す
 //   u32 型は32ビット符号なし整数
 //   [u32] 型はu32のスライス（現時点ではスライスは1次元の配列と考えてよい）
-pub fn sort<T>(x: &mut [T], up: bool) {
+// 型パラメータＴにトレイト境界Ord（全順序）を追加する
+pub fn sort<T: Ord>(x: &mut [T], up: bool) {
     // 未実装の意味。コンパイルは通るが、実行すると panic する
     // unimplemented!();
 
@@ -16,7 +17,7 @@ pub fn sort<T>(x: &mut [T], up: bool) {
     }
 }
 
-fn sub_sort<T>(x: &mut [T], up: bool) {
+fn sub_sort<T: Ord>(x: &mut [T], up: bool) {
     if x.len() > 1 {
         compare_and_swap(x, up);
         let mid_point = x.len() / 2;
@@ -25,7 +26,7 @@ fn sub_sort<T>(x: &mut [T], up: bool) {
     }
 }
 
-fn compare_and_swap<T>(x: &mut [T], up: bool) {
+fn compare_and_swap<T: Ord>(x: &mut [T], up: bool) {
     let mid_point = x.len() / 2;
     for i in 0..mid_point {
         if (x[mid_point + i] < x[i]) == up {
@@ -39,7 +40,7 @@ fn compare_and_swap<T>(x: &mut [T], up: bool) {
 // このモジュールは cargo test を実行したときのみコンパイルされる
 #[cfg(test)]
 mod tests {
-    // 親モジュール（first）のsort関数を使用する
+    // 親モジュール（second）のsort関数を使用する
     use super::sort;
 
     // #[test] のついた関数はcargo testしたときに実行される
@@ -78,4 +79,11 @@ mod tests {
         sort(&mut x, false);
         assert_eq!(x, vec!["with", "no", "memory-efficient", "is", "fast", "and", "Rust", "GC"]);
     }
+
+    // #[test]
+    // fn sort_f64() {
+    //     let mut x = vec![20.0, -30.0, 11.0, 10.0];
+    //     sort(&mut x, false);
+    // }
+    // error[E0277]: the trait bound `{float}: std::cmp::Ord` is not satisfied
 }
