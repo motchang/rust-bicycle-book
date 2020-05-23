@@ -6,6 +6,18 @@
 //   [u32] 型はu32のスライス（現時点ではスライスは1次元の配列と考えてよい）
 // 型パラメータＴにトレイト境界Ord（全順序）を追加する
 use super::SortOrder;
+use std::cmp::Ordering;
+
+pub fn sort_by<T, F>(x: &mut [T], comparator: &F) -> Result<(), String>
+where F: Fn(&T, &T) -> Ordering
+{
+    if x.len().is_power_of_two() {
+        do_sort(x, true, comparator);
+        Ok(())
+    } else {
+        Err(format!("The length of x is not a power of two. (x.len(): {})", x.len()))
+    }
+}
 
 pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
     if x.len().is_power_of_two() {
