@@ -3,19 +3,28 @@ use rand::distributions::Standard;
 use rand_pcg::Pcg64Mcg;
 
 pub fn new_u32_vec(n: usize) -> Vec<u32> {
-    // RNG を初期化する。再現性を持たせるため、毎回同じシード値を使う
     let mut rng = Pcg64Mcg::from_seed([0; 16]);
-    // n個の要素が格納できるようベクタを初期化する
-    let mut v = Vec::with_capacity(n);
 
-    // 0 から n-1 までの合計 n回、繰り返し乱数を生成し、ベクタに追加する
-    // (0から n-1の数列は使わないので、_で受け取ることで、すぐに破棄している)
-    for _ in 0..n {
-        // RNG の sample メソッドは引数として与えられた分布にしたがう乱数を1つ生成する
-        // Standard分布は生成する値が整数型（ここではu32型）の時は一様分布
-        // になる。つまり、その型が取りうるすべての値が同じ確率で出現する
-        v.push(rng.sample(&Standard));
-    }
+    // rng.sample_iter() は乱数を無限に生成するイテレータを返す
+    // take(n) は元のイテレータから最初のn要素だけを取り出すイテレータを返す
+    // collect()はイテレータから値を収集して、ベクタやハッシュマップのような
+    // コレクションに格納する
+    rng.sample_iter(&Standard).take(n).collect()
+}
 
-    v
+pub fn is_sorted_ascending<T: Ord>(x: &[T]) -> bool {
+    // windows(2) は元のイテレータから1要素刻みで2要素ずつ値を取り出す
+    // 新しいイテレータを返す。たとえば元が[1, 2, 3, 4]なら
+    // [1, 2], [2, 3], [3, 4]を順に返す
+    //
+    // all(..)はイテレータから値（例：[1, 2]）を取り出し、クロージャに渡す
+    // クロージャがfalseを返したら、そこで処理を打ち切りfalseを返す
+    // クロージャがtrueを返している間は、イテレータから次の値を取り出し
+    // クロージャを与え続ける。イテレータの値が尽きるまで（Noneになるまで）
+    // クロージャが一度もfalseを返さなかったら、all(..)はtrueを返す
+    x.windows(2).all(|pair| pair[0] <= pair[1])
+}
+
+pub fn is_sorted_descending<T: Ord>(x: &[T]) -> bool {
+    x.windows(2).all(|pair| pair[0] >= pair[1])
 }
