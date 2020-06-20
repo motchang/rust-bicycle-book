@@ -43,6 +43,12 @@ where T: Send,
     if x.len() > 1 {
         let mid_point = x.len() / 2;
 
+        // これは lef first = の行で xに対する可変の参照が作られ、それが返却される前に
+        // let second = の行で再度可変の借用を作ろうとしているためエラーとなる
+        // let first = &mut x[..mid_point];
+        // let second = &mut x[mid_point..];
+        let (first, second) = x.split_at_mut(mid_point);
+
         // xの分割後の要素数を閾値 PARALLEL_THRESHOLD と比較する
         if mid_point >= PARALLEL_THRESHOLD {
             // 閾値以上なら並列にソートする（並列処理）
@@ -52,8 +58,8 @@ where T: Send,
             // error[E0277]: `F` cannot be shared between threads safely
             // error[E0277]: `T` cannot be sent between threads safely
 
-            rayon::join(|| do_sort(x, forward, comparator),
-                        || do_sort(&mut x[mid_point..], false, comparator));
+            rayon::join(|| do_sort(first, forward, comparator),
+                        || do_sort(second, false, comparator));
         } else {
             // x をバイトニックソートする
             // 第二引数が true のときは comparator で示される順序でソート
