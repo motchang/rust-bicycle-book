@@ -10,7 +10,8 @@ use rayon;
 use std::cmp::Ordering;
 
 pub fn sort_by<T, F>(x: &mut [T], comparator: &F) -> Result<(), String>
-where F: Fn(&T, &T) -> Ordering
+where T: Send,
+      F: Sync + Fn(&T, &T) -> Ordering
 {
     if x.len().is_power_of_two() {
         do_sort(x, true, comparator);
@@ -20,7 +21,7 @@ where F: Fn(&T, &T) -> Ordering
     }
 }
 
-pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
+pub fn sort<T: Ord + Send>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
     // do_sort を呼ぶ代わりに、sort_by を呼ぶようにする
     // is_power_of_two は sort_by が呼ぶので、ここからは削除した
     match *order {
@@ -32,7 +33,8 @@ pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
 const PARALLEL_THRESHOLD: usize = 4096;
 
 fn do_sort<T, F>(x: &mut [T], forward: bool, comparator: &F)
-where F: Fn(&T, &T) -> Ordering
+where T: Send,
+      F: Sync + Fn(&T, &T) -> Ordering
 {
 
     // 未実装の意味。コンパイルは通るが、実行すると panic する
