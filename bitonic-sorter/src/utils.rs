@@ -1,5 +1,5 @@
-use rand::{Rng, SeedableRng};
 use rand::distributions::Standard;
+use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 
 pub fn new_u32_vec(n: usize) -> Vec<u32> {

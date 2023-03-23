@@ -9,17 +9,21 @@ use super::SortOrder;
 use std::cmp::Ordering;
 
 pub fn sort_by<T, F>(x: &mut [T], comparator: &F) -> Result<(), String>
-where F: Fn(&T, &T) -> Ordering
+where
+    F: Fn(&T, &T) -> Ordering,
 {
     if x.len().is_power_of_two() {
         do_sort(x, true, comparator);
         Ok(())
     } else {
-        Err(format!("The length of x is not a power of two. (x.len(): {})", x.len()))
+        Err(format!(
+            "The length of x is not a power of two. (x.len(): {})",
+            x.len()
+        ))
     }
 }
 
-pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
+pub fn sort<T: Ord>(x: &mut [T], order: &SortOrder) -> Result<(), String> {
     // do_sort を呼ぶ代わりに、sort_by を呼ぶようにする
     // is_power_of_two は sort_by が呼ぶので、ここからは削除した
     match *order {
@@ -29,9 +33,9 @@ pub fn sort<T: Ord>(x: &mut[T], order: &SortOrder) -> Result<(), String> {
 }
 
 fn do_sort<T, F>(x: &mut [T], forward: bool, comparator: &F)
-where F: Fn(&T, &T) -> Ordering
+where
+    F: Fn(&T, &T) -> Ordering,
 {
-
     // 未実装の意味。コンパイルは通るが、実行すると panic する
     // unimplemented!();
 
@@ -49,7 +53,8 @@ where F: Fn(&T, &T) -> Ordering
 }
 
 fn sub_sort<T, F>(x: &mut [T], forward: bool, comparator: &F)
-    where F: Fn(&T, &T) -> Ordering
+where
+    F: Fn(&T, &T) -> Ordering,
 {
     if x.len() > 1 {
         compare_and_swap(x, forward, comparator);
@@ -60,7 +65,8 @@ fn sub_sort<T, F>(x: &mut [T], forward: bool, comparator: &F)
 }
 
 fn compare_and_swap<T, F>(x: &mut [T], forward: bool, comparator: &F)
-    where F: Fn(&T, &T) -> Ordering
+where
+    F: Fn(&T, &T) -> Ordering,
 {
     // 比較に先立ち forward(bool) を Orderingに変換しておく
     let swap_condition = if forward {
@@ -74,19 +80,18 @@ fn compare_and_swap<T, F>(x: &mut [T], forward: bool, comparator: &F)
     for i in 0..mid_point {
         // comparator クロージャで2要素を比較し、返されたOrderingのバリアントが
         // swap_condition とひとしいなら要素を交換する
-        if comparator(&x[i], &x[mid_point+i]) == swap_condition {
+        if comparator(&x[i], &x[mid_point + i]) == swap_condition {
             x.swap(i, mid_point + i)
         }
     }
 }
 
-
 // このモジュールは cargo test を実行したときのみコンパイルされる
 #[cfg(test)]
 mod tests {
     use super::{sort, sort_by};
+    use crate::utils::{is_sorted_ascending, is_sorted_descending, new_u32_vec};
     use crate::SortOrder::*;
-    use crate::utils::{new_u32_vec, is_sorted_ascending, is_sorted_descending};
 
     // impl PartialEq for Student {
     //     fn eq(&self, other: &Self) -> bool{
@@ -118,13 +123,11 @@ mod tests {
                 // to_string メソッドで &str 型の引数から String 型の値を作る。
                 first_name: first_name.to_string(), // first_name フィールドに値を設定
                 second_name: last_name.to_string(), // last_name フィールドに値を設定
-                age, // ageフィールドにage変数の値を設定
-                    // フィールドと変数が同じ名前のときは、このように省略形で書ける
+                age,                                // ageフィールドにage変数の値を設定
+                                                    // フィールドと変数が同じ名前のときは、このように省略形で書ける
             }
         }
     }
-
-
 
     #[test]
     // 年齢で昇順にソートする
@@ -162,12 +165,14 @@ mod tests {
         let mut x = vec![&taro, &hanako, &kyoko, &ryosuke];
         let expected = vec![&ryosuke, &kyoko, &hanako, &taro];
 
-        assert_eq!(sort_by(&mut x,
-                           &|a, b| a.second_name.cmp(&b.second_name)
-                           // もし last_name が等しくない（LessまはたGreater）ならをれを返す
-                           // last_name が等しい（Equal）ならfirst_nameを比較する
-                           .then_with(|| a.first_name.cmp(&b.first_name))), Ok(())
-
+        assert_eq!(
+            sort_by(&mut x, &|a, b| a
+                .second_name
+                .cmp(&b.second_name)
+                // もし last_name が等しくない（LessまはたGreater）ならをれを返す
+                // last_name が等しい（Equal）ならfirst_nameを比較する
+                .then_with(|| a.first_name.cmp(&b.first_name))),
+            Ok(())
         );
         assert_eq!(x, expected);
     }
@@ -196,17 +201,59 @@ mod tests {
     #[test]
     fn sort_str_ascending() {
         // 文字列のベクタを作り、ソートする
-        let mut x = vec!["Rust", "is", "fast", "and", "memory-efficient", "with", "no", "GC"];
+        let mut x = vec![
+            "Rust",
+            "is",
+            "fast",
+            "and",
+            "memory-efficient",
+            "with",
+            "no",
+            "GC",
+        ];
         assert_eq!(sort(&mut x, &Ascending), Ok(()));
-        assert_eq!(x, vec!["GC", "Rust", "and", "fast", "is", "memory-efficient", "no", "with"]);
+        assert_eq!(
+            x,
+            vec![
+                "GC",
+                "Rust",
+                "and",
+                "fast",
+                "is",
+                "memory-efficient",
+                "no",
+                "with"
+            ]
+        );
     }
 
     #[test]
     fn sort_str_descending() {
-        let mut x = vec!["Rust", "is", "fast", "and", "memory-efficient", "with", "no", "GC"];
+        let mut x = vec![
+            "Rust",
+            "is",
+            "fast",
+            "and",
+            "memory-efficient",
+            "with",
+            "no",
+            "GC",
+        ];
         // let mut x = vec!["Rust", "is", "a", "system", "programming", "language", "that", "runs"];
         assert_eq!(sort(&mut x, &Descending), Ok(()));
-        assert_eq!(x, vec!["with", "no", "memory-efficient", "is", "fast", "and", "Rust", "GC"]);
+        assert_eq!(
+            x,
+            vec![
+                "with",
+                "no",
+                "memory-efficient",
+                "is",
+                "fast",
+                "and",
+                "Rust",
+                "GC"
+            ]
+        );
     }
 
     #[test]

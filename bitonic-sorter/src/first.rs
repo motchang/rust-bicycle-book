@@ -35,7 +35,6 @@ fn compare_and_swap(x: &mut [u32], up: bool) {
     }
 }
 
-
 // このモジュールは cargo test を実行したときのみコンパイルされる
 #[cfg(test)]
 mod tests {

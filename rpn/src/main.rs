@@ -18,26 +18,26 @@ fn rpn(exp: &str) -> f64 {
     // exp.split_whitespace() は、メソッド呼び出し構文と呼ばれ、コンパイル時に split_whitespace(&exp) という関数呼び出しとして評価されます
     for token in exp.split_whitespace() {
         // token が f64型の数値ならスタックに積む
-	// たとえば "6.1" なら成功しますので Ok(6.1)が返されます
-	// それを if let 式で受けることで、数値の場合は条件が成立し、ベクタの push メソッドでその値をスタックの最後に追加します
+        // たとえば "6.1" なら成功しますので Ok(6.1)が返されます
+        // それを if let 式で受けることで、数値の場合は条件が成立し、ベクタの push メソッドでその値をスタックの最後に追加します
 
         match token.parse::<f64>() {
             Ok(num) => {
-                    stack.push(num);
-                }
+                stack.push(num);
+            }
             _ => {
-                    // token が数値でないなら、演算子なのか調べる
-                    match token {
-                        // token が演算子なら apply2 関数で計算する
-                        // |x, y| x + y はクロージャ
-                        // 引数x, yを取り, x + y を計算して答えを返す
-                        "+" => apply2(&mut stack, |x, y| x + y),
-                        "-" => apply2(&mut stack, |x, y| x - y),
-                        "*" => apply2(&mut stack, |x, y| x * y),
-                        "/" => apply2(&mut stack, |x, y| x / y),
-                        _ => panic!("Unknown operator: {}", token),
-                    }
+                // token が数値でないなら、演算子なのか調べる
+                match token {
+                    // token が演算子なら apply2 関数で計算する
+                    // |x, y| x + y はクロージャ
+                    // 引数x, yを取り, x + y を計算して答えを返す
+                    "+" => apply2(&mut stack, |x, y| x + y),
+                    "-" => apply2(&mut stack, |x, y| x - y),
+                    "*" => apply2(&mut stack, |x, y| x * y),
+                    "/" => apply2(&mut stack, |x, y| x / y),
+                    _ => panic!("Unknown operator: {}", token),
                 }
+            }
         }
     }
 
@@ -56,12 +56,12 @@ where
 {
     // 変数yとxをスタックの最後2要素に束縛する
     if let (Some(y), Some(x)) = (stack.pop(), stack.pop()) {
-	// クロージャfunで計算し、その結果に変数ｚを束縛する。
-	let z = fun(x, y);
-	// 変数zの値をスタックに積む
-	stack.push(z);
+        // クロージャfunで計算し、その結果に変数ｚを束縛する。
+        let z = fun(x, y);
+        // 変数zの値をスタックに積む
+        stack.push(z);
     } else {
-	// スタックから要素が取り出せなかった時はエラーを起こして終了する
-	panic!("Stack underflow");
+        // スタックから要素が取り出せなかった時はエラーを起こして終了する
+        panic!("Stack underflow");
     }
 }
